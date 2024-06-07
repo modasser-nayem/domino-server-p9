@@ -6,9 +6,14 @@ import app from "./app";
 
 let server: Server;
 
+const dbUrl = config.db_url as string;
+
 const main = async () => {
   try {
-    await mongoose.connect(config.db_url as string);
+    await mongoose.connect(dbUrl, {
+      connectTimeoutMS: 30000,
+      socketTimeoutMS: 30000,
+    });
     server = app.listen(config.port, () => {
       console.log(`SERVER IS RUNNING ON ${config.port}`);
     });
