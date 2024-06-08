@@ -1,9 +1,10 @@
 import { Schema, model } from "mongoose";
-import { TProfileModel, TUserModel } from "./auth.interface";
+import { IUserModel, TProfile, TUser } from "./auth.interface";
 import { bloodGroups } from "../../constant/global.constant";
+import { checkPasswordIsCorrect, makeHashPassword } from "./auth.utils";
 
 // user model
-const userSchema = new Schema<TUserModel>(
+const userSchema = new Schema<TUser, IUserModel>(
   {
     email: {
       type: String,
@@ -12,6 +13,7 @@ const userSchema = new Schema<TUserModel>(
     password: {
       type: String,
       required: true,
+      select: 0,
     },
     lastPassChangeAt: {
       type: Date,
@@ -45,10 +47,40 @@ const userSchema = new Schema<TUserModel>(
   { id: true, timestamps: true },
 );
 
-export const UserModel = model<TUserModel>("User", userSchema);
+userSchema.pre("save", async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  user.password = await makeHashPassword(user.password);
+
+  next();
+});
+
+userSchema.post("save", async function (doc, next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  doc.password = "";
+  next();
+});
+
+userSchema.statics.isPasswordIsMatched = async function (
+  plainTextPassword: string,
+  hashedPassword: string,
+) {
+  return await checkPasswordIsCorrect(plainTextPassword, hashedPassword);
+};
+
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
+  passwordChangedTimestamp: Date,
+  jwtIssuedTimestamp: number,
+) {
+  const passwordChangedTime =
+    new Date(passwordChangedTimestamp).getTime() / 1000;
+  return passwordChangedTime > jwtIssuedTimestamp;
+};
+
+export const User = model<TUser, IUserModel>("User", userSchema);
 
 // profile model
-const profileSchema = new Schema<TProfileModel>(
+const profileSchema = new Schema<TProfile>(
   {
     user: {
       type: Schema.ObjectId,
@@ -95,4 +127,4 @@ const profileSchema = new Schema<TProfileModel>(
   { id: true, timestamps: true },
 );
 
-export const ProfileModel = model<TProfileModel>("Profile", profileSchema);
+export const Profile = model<TProfile>("Profile", profileSchema);

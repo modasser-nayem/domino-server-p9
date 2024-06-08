@@ -12,7 +12,7 @@ const globalErrorhandler: ErrorRequestHandler = (err, req, res, next) => {
   let message = err.message || "Something went wrong!";
   let statusCode = err.statusCode || 500;
   let error = err || null;
-  let stack = err.stack || "";
+  let stack = err.stack || null;
 
   if (err instanceof ZodError) {
     const result = zodErrorHandler(err);
@@ -31,9 +31,9 @@ const globalErrorhandler: ErrorRequestHandler = (err, req, res, next) => {
     error = result.error;
   } else if (err instanceof JsonWebTokenError) {
     statusCode = 401;
-    message = "Unauthorized Access, please login";
+    message = "Unauthorized Access";
     error = null;
-    stack = null;
+    stack = err.stack;
   } else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;

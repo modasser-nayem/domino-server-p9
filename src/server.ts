@@ -10,10 +10,7 @@ const dbUrl = config.db_url as string;
 
 const main = async () => {
   try {
-    await mongoose.connect(dbUrl, {
-      connectTimeoutMS: 30000,
-      socketTimeoutMS: 30000,
-    });
+    await mongoose.connect(dbUrl);
     server = app.listen(config.port, () => {
       console.log(`SERVER IS RUNNING ON ${config.port}`);
     });

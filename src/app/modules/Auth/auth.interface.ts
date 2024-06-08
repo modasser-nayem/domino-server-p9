@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { z } from "zod";
 import authSchemaValidation from "./auth.validation";
-import { Types } from "mongoose";
+import { Model, Types } from "mongoose";
 import { TBloodGroup } from "../../interface/global.types";
+import { UserRole } from "../../constant/user.constant";
 const {
   registerUser,
   loginUser,
@@ -19,10 +21,10 @@ export type TForgotPassword = z.infer<typeof forgetPassword>;
 
 export type TResetPassword = z.infer<typeof resetPassword>;
 
-export type TUserRole = "admin" | "instructor" | "student";
+export type TUserRole = keyof typeof UserRole;
 export type TUserStatus = "block" | "unblock";
 
-export type TUserModel = {
+export type TUser = {
   email: string;
   password: string;
   lastPassChangeAt: Date;
@@ -33,7 +35,7 @@ export type TUserModel = {
   isDeleted: boolean;
 };
 
-export type TProfileModel = {
+export type TProfile = {
   user: Types.ObjectId;
   name: string;
   designation: string;
@@ -65,3 +67,14 @@ export type TProfileModel = {
     website: string;
   };
 };
+
+export interface IUserModel extends Model<TUser> {
+  isPasswordIsMatched(
+    plainTextPassword: string,
+    hashPassword: string,
+  ): Promise<boolean>;
+  isJWTIssuedBeforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number,
+  ): boolean;
+}

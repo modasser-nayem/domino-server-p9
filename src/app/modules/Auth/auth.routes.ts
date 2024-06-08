@@ -2,6 +2,7 @@ import { Router } from "express";
 import authControllers from "./auth.controller";
 import requestValidate from "../../middlewares/requestValidation";
 import authSchemaValidation from "./auth.validation";
+import auth from "../../middlewares/auth";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.post(
 // change password
 router.put(
   "/change-password",
+  auth(),
   requestValidate(authSchemaValidation.changePassword),
   authControllers.changePassword,
 );
@@ -41,7 +43,7 @@ router.put(
 );
 
 // delete account
-router.delete("/account", authControllers.deleteAccount);
+router.delete("/account", auth(), authControllers.deleteAccount);
 
 const authRoutes = router;
 export default authRoutes;
