@@ -1,6 +1,6 @@
 import { TBloodGroup } from "../interface/global.types";
 
-export const bloodGroups: TBloodGroup[] = [
+export const bloodGroupsArray: TBloodGroup[] = [
   "A+",
   "A-",
   "B+",

@@ -1,10 +1,12 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import config from "../config";
 
 import catchAsync from "../utils/catchAsync";
-import { TUserRole } from "../modules/Auth/auth.interface";
+import { TUserRole } from "../modules/User/user.interface";
 import AppError from "../error/AppError";
-import { User } from "../modules/Auth/auth.model";
+import { User } from "../modules/User/user.model";
+import { UserStatus } from "../constant/user.constant";
+import { ExtendedJwtPayload } from "../interface";
 
 const auth = (...roles: TUserRole[]) => {
   return catchAsync(async (req, res, next) => {
@@ -19,10 +21,9 @@ const auth = (...roles: TUserRole[]) => {
     const decoded = jwt.verify(
       token,
       config.jwt_access_secret as string,
-    ) as JwtPayload;
+    ) as ExtendedJwtPayload;
 
     const { role, id, iat } = decoded;
-
     // checking if the user is exist
     const user = await User.findById(id);
 
@@ -40,7 +41,7 @@ const auth = (...roles: TUserRole[]) => {
     // checking if the user is blocked
     const userStatus = user?.status;
 
-    if (userStatus === "block") {
+    if (userStatus === UserStatus.blocked) {
       throw new AppError(403, "This user is blocked");
     }
 
@@ -54,11 +55,11 @@ const auth = (...roles: TUserRole[]) => {
       throw new AppError(401, "You are not authorized !");
     }
 
-    if (roles && roles.length && !roles.includes(role)) {
+    if (roles.length && !roles.includes(role)) {
       throw new AppError(403, "You don't have permission to access this data!");
     }
 
-    req.user = decoded as JwtPayload;
+    req.user = decoded as ExtendedJwtPayload;
     next();
   });
 };

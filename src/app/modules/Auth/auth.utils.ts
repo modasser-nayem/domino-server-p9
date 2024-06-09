@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import config from "../../config";
+import { ExtendedJwtPayload } from "../../interface";
 
 export const makeHashPassword = async (plainTextPassword: string) => {
   return await bcrypt.hash(
@@ -27,5 +28,5 @@ export const createToken = (
 };
 
 export const verifyToken = (token: string, secret: string) => {
-  return jwt.verify(token, secret) as JwtPayload;
+  return jwt.verify(token, secret) as ExtendedJwtPayload;
 };

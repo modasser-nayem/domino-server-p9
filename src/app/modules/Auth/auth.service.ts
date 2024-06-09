@@ -7,11 +7,12 @@ import {
   TResetPassword,
 } from "./auth.interface";
 import mongoose from "mongoose";
-import { Profile, User } from "./auth.model";
+import { Profile, User } from "../User/user.model";
 import config from "../../config";
 import AppError from "../../error/AppError";
 import { createToken, makeHashPassword, verifyToken } from "./auth.utils";
 import { sendEmail } from "../../utils/sendEmail";
+import { UserStatus } from "../../constant/user.constant";
 
 const registerUser = async (payload: { data: TRegisterUser }) => {
   const userData = {
@@ -63,8 +64,8 @@ const loginUser = async (payload: { data: TLoginUser }) => {
     throw new AppError(404, "User not exist!");
   }
 
-  if (user.status === "block") {
-    throw new AppError(403, "Your account is block");
+  if (user.status === UserStatus.blocked) {
+    throw new AppError(403, "Your account is blocked");
   }
 
   if (user.isDeleted === true) {
@@ -129,7 +130,7 @@ const forgotPassword = async (payload: { data: TForgotPassword }) => {
     throw new AppError(404, "User not exist!");
   }
 
-  if (user.status === "block") {
+  if (user.status === UserStatus.blocked) {
     throw new AppError(403, "Your account is blocked");
   }
 
@@ -168,7 +169,7 @@ const resetPassword = async (payload: {
     throw new AppError(404, "User not exist!");
   }
 
-  if (user.status === "block") {
+  if (user.status === UserStatus.blocked) {
     throw new AppError(403, "Your account is block");
   }
 
