@@ -33,5 +33,33 @@ router.delete(
   categoriesControllers.deleteCategory,
 );
 
+// =========== Sub Category ===========
+
+// add subcategory
+router.post(
+  "/subcategory",
+  auth(UserRole.admin),
+  requestValidate(categoriesSchemaValidation.addSubcategory),
+  categoriesControllers.addSubcategory,
+);
+
+// get all subcategory
+router.get("/subcategory", categoriesControllers.getAllSubcategory);
+
+// update subcategory
+router.put(
+  "/subcategory/:id",
+  auth(UserRole.admin),
+  requestValidate(categoriesSchemaValidation.updateSubcategory),
+  categoriesControllers.updateSubcategory,
+);
+
+// delete subcategory
+router.delete(
+  "/subcategory/:id",
+  auth(UserRole.admin),
+  categoriesControllers.deleteSubcategory,
+);
+
 const categoriesRoutes = router;
 export default categoriesRoutes;

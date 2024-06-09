@@ -51,10 +51,65 @@ const deleteCategory = catchAsync(async (req, res) => {
   });
 });
 
+// ============ Sub Category ============
+
+const addSubcategory = catchAsync(async (req, res) => {
+  const result = await categoriesServices.addSubcategory({ data: req.body });
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Sub Category Successfully Added",
+    data: result,
+  });
+});
+
+const getAllSubcategory = catchAsync(async (req, res) => {
+  const result = await categoriesServices.getAllSubcategory();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Successfully retrieved all sub category",
+    data: result,
+  });
+});
+
+const updateSubcategory = catchAsync(async (req, res) => {
+  const result = await categoriesServices.updateSubcategory({
+    categoryId: req.params.id,
+    data: req.body,
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Category Successfully Updated",
+    data: result,
+  });
+});
+
+const deleteSubcategory = catchAsync(async (req, res) => {
+  const result = await categoriesServices.deleteSubcategory({
+    categoryId: req.params.id,
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Category Successfully Deleted",
+    data: result,
+  });
+});
+
 const categoriesControllers = {
   addCategory,
   getAllCategory,
   updateCategory,
   deleteCategory,
+  addSubcategory,
+  getAllSubcategory,
+  updateSubcategory,
+  deleteSubcategory,
 };
 export default categoriesControllers;
