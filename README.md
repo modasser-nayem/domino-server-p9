@@ -2,16 +2,20 @@
 
 <a name="readme-top"></a>
 
-### Live API Link: 
+### Live API Link:
 
 <br/>
 <!-- ABOUT THE PROJECT -->
+
+## Face Problems
+
+- User role base profile get
 
 ## API Documentation
 
 I used postman to do api documentation. Click the link below to view the api documentation.
 
-#### Postman link: 
+#### Postman link:
 
 ## API Endpoints
 
@@ -21,15 +25,14 @@ I used postman to do api documentation. Click the link below to view the api doc
 
 <!-- - **POST**: `/auth/register` - User Registration -->
 
-
 ## Getting Started
 
 ### 1. Clone the repository:
 
 ```
-git clone 
+git clone
 
-cd 
+cd
 ```
 
 ### 2. Install Dependencies:
