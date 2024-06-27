@@ -64,13 +64,16 @@ const getAllCourses = async () => {
       language: 1,
       status: 1,
     },
-  ).populate({ path: "instructor", select: "_id" });
+  ).populate({ path: "instructor", select: "_id name" });
 
   return result;
 };
 
 const getSingleCourse = async (payload: { courseId: string }) => {
-  const result = await Course.findById(payload.courseId);
+  const result = await Course.findById(payload.courseId, { __v: 0 }).populate({
+    path: "instructor",
+    select: "_id name",
+  });
 
   if (!result) {
     throw new AppError(404, "Course not found");
@@ -111,6 +114,8 @@ const deleteCourse = async (payload: {
   if (course.instructor.toString() !== payload.user.id) {
     throw new AppError(403, "You don't have permission to update this data");
   }
+
+  await Course.deleteOne({ _id: course._id });
 
   return payload;
 };

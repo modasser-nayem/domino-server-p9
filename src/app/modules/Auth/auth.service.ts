@@ -16,12 +16,12 @@ import { UserStatus } from "../../constant/user.constant";
 
 const registerUser = async (payload: { data: TRegisterUser }) => {
   const userData = {
+    name: payload.data.name,
     email: payload.data.email,
     password: payload.data.password,
   };
 
   const profileData = {
-    name: payload.data.name,
     contactNo: payload.data.contactNo,
   };
 
@@ -144,7 +144,7 @@ const forgotPassword = async (payload: { data: TForgotPassword }) => {
     config.jwt_forgot_pass_expires_in,
   );
 
-  const generateURL = `${config.client_url}?token=${forgotPassToken}`;
+  const generateURL = `${config.reset_pass_url}?token=${forgotPassToken}`;
 
   const htmlDoc = generateURL;
 

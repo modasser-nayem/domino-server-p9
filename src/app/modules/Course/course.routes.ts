@@ -19,7 +19,7 @@ router.post(
 router.get("/", courseControllers.getAllCourses);
 
 // get my courses
-router.get("/", courseControllers.getAllCourses);
+router.get("/my", courseControllers.getAllCourses);
 
 // get single course
 router.get("/:id", courseControllers.getSingleCourse);

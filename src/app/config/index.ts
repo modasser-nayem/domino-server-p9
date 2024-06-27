@@ -17,6 +17,7 @@ export default {
   jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN as string,
   jwt_forgot_pass_expires_in: process.env.JWT_FORGOT_PASS_EXPIRES_IN as string,
   client_url: process.env.CLIENT_URL,
+  reset_pass_url: process.env.RESET_PASS_URL,
   email_host_user: process.env.EMAIL_HOST_USER,
   email_host_pass: process.env.EMAIL_HOST_PASS,
 };

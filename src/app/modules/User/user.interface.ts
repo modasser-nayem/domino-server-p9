@@ -9,6 +9,8 @@ export type TUserRole = keyof typeof UserRole;
 export type TUserStatus = keyof typeof UserStatus;
 
 export type TUser = {
+  name: string;
+  profileImg: string;
   email: string;
   password: string;
   lastPassChangeAt: Date;
@@ -21,10 +23,8 @@ export type TUser = {
 
 export type TProfile = {
   user: Types.ObjectId;
-  name: string;
   designation: string;
   about: string;
-  profileImg: string;
   gender: "male" | "female";
   dateOfBirth: Date;
   bloodGroup: TBloodGroup;

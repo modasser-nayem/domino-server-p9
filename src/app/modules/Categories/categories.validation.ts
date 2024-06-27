@@ -26,6 +26,10 @@ const addSubcategory = z.object({
 });
 
 const updateSubcategory = z.object({
+  category: z
+    .string()
+    .optional()
+    .refine((value) => value !== "", { message: "category is required" }),
   name: z
     .string()
     .optional()

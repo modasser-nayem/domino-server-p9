@@ -6,6 +6,7 @@ import {
 import { Profile, User } from "./user.model";
 import AppError from "../../error/AppError";
 import { ExtendedJwtPayload } from "../../interface";
+import mongoose from "mongoose";
 
 const getMyProfile = async (payload: { user: ExtendedJwtPayload }) => {
   const profile = await Profile.findOne(
@@ -13,7 +14,7 @@ const getMyProfile = async (payload: { user: ExtendedJwtPayload }) => {
     { __v: 0 },
   ).populate({
     path: "user",
-    select: "email lastPassChangeAt lastLogin",
+    select: "name profileImg email lastPassChangeAt lastLogin",
   });
 
   if (!profile) {
@@ -27,23 +28,52 @@ const updateMyProfile = async (payload: {
   user: ExtendedJwtPayload;
   data: TUpdateMyProfile;
 }) => {
-  const result = await Profile.findOneAndUpdate(
-    { user: payload.user.id },
-    payload.data,
-    { new: true },
-  );
+  const { user: userData, ...profileData } = payload.data;
 
-  return result;
+  if (userData?.email) {
+    const isEmailExist = await User.findOne({ email: userData?.email });
+
+    if (isEmailExist) {
+      throw new AppError(400, "This email already exist!");
+    }
+  }
+
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+
+    await User.findByIdAndUpdate(payload.user.id, userData, {
+      session,
+    });
+
+    const profileResult = await Profile.findOneAndUpdate(
+      { user: payload.user.id },
+      profileData,
+      { session, new: true, projection: { __v: 0 } },
+    ).populate({
+      path: "user",
+      select: "name profileImg email lastPassChangeAt lastLogin",
+    });
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return profileResult;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    // eslint-disable-next-line no-console
+    console.log(error);
+    throw new AppError(400, error.message);
+  }
 };
 
 const getAllUsers = async () => {
-  const users = await Profile.find(
+  const users = await User.find(
     {},
-    { name: 1, designation: 1, profileImg: 1, contactNo: 1 },
-  ).populate({
-    path: "user",
-    select: "email status role",
-  });
+    { name: 1, profileImg: 1, email: 1, status: 1, role: 1 },
+  );
   return users;
 };
 
@@ -59,18 +89,18 @@ const getAllInstructorForPublic = async () => {
       },
     },
     { $unwind: "$user" },
-    { $match: { "user.role": "admin" } },
-    {
-      $project: {
-        _id: 0,
-        user: 1,
-        name: 1,
-        designation: 1,
-        profileImg: 1,
-        contactNo: 1,
-        socialLinks: 1,
-      },
-    },
+    { $match: { "user.role": "instructor" } },
+    // {
+    //   $project: {
+    //     _id: 0,
+    //     user: 1,
+    //     name: 1,
+    //     designation: 1,
+    //     profileImg: 1,
+    //     contactNo: 1,
+    //     socialLinks: 1,
+    //   },
+    // },
   ]);
 
   return users;
@@ -87,7 +117,10 @@ const getSingleUserProfile = async (payload: { userId: string }) => {
     throw new AppError(404, "User not found");
   }
 
-  const result = await Profile.findOne({ user: user.id }, { __v: 0 });
+  const result = await Profile.findOne({ user: user.id }, { __v: 0 }).populate({
+    path: "user",
+    select: "name profileImg email",
+  });
 
   return result;
 };

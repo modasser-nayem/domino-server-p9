@@ -92,7 +92,10 @@ const addSubcategory = async (payload: { data: TAddSubcategory }) => {
 };
 
 const getAllSubcategory = async () => {
-  const result = await Subcategory.find({}, { __v: 0, updatedAt: 0 });
+  const result = await Subcategory.find({}, { __v: 0, updatedAt: 0 }).populate({
+    path: "category",
+    select: "name image",
+  });
 
   return result;
 };
@@ -109,6 +112,12 @@ const updateSubcategory = async (payload: {
 
   if (!subcategory) {
     throw new AppError(404, "Subcategory not found");
+  }
+
+  const category = await Category.findById(payload.data.category);
+
+  if (!category) {
+    throw new AppError(404, "Category not found");
   }
 
   const nameExist = await Subcategory.findOne({

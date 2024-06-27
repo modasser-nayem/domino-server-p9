@@ -1,10 +1,15 @@
 import { z } from "zod";
 
 const updateMyProfile = z.object({
-  name: z.string().optional(),
+  user: z
+    .object({
+      name: z.string().optional(),
+      profileImg: z.string().url().optional(),
+      email: z.string().email().optional(),
+    })
+    .optional(),
   designation: z.string().optional(),
   about: z.string().optional(),
-  profileImg: z.string().url().optional(),
   gender: z.enum(["male", "female"]).optional(),
   dateOfBirth: z.string().datetime().optional(),
   bloodGroup: z
@@ -36,11 +41,11 @@ const updateMyProfile = z.object({
     .optional(),
   socialLinks: z
     .object({
-      facebook: z.string().url(),
-      twitter: z.string().url(),
-      linkedIn: z.string().url(),
-      youtube: z.string().url(),
-      website: z.string().url(),
+      facebook: z.string().url().optional(),
+      twitter: z.string().url().optional(),
+      linkedIn: z.string().url().optional(),
+      youtube: z.string().url().optional(),
+      website: z.string().url().optional(),
     })
     .optional(),
 });

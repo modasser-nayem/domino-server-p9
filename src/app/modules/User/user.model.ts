@@ -6,6 +6,10 @@ import { checkPasswordIsCorrect, makeHashPassword } from "../Auth/auth.utils";
 // user model
 const userSchema = new Schema<TUser, IUserModel>(
   {
+    name: {
+      type: String,
+    },
+    profileImg: String,
     email: {
       type: String,
       required: true,
@@ -86,12 +90,8 @@ const profileSchema = new Schema<TProfile>(
       type: Schema.ObjectId,
       ref: "User",
     },
-    name: {
-      type: String,
-    },
     designation: String,
     about: String,
-    profileImg: String,
     gender: {
       type: String,
       enum: ["male", "female"],
