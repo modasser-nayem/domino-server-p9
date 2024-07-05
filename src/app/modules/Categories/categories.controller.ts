@@ -14,7 +14,7 @@ const addCategory = catchAsync(async (req, res) => {
 });
 
 const getAllCategory = catchAsync(async (req, res) => {
-  const result = await categoriesServices.getAllCategory();
+  const result = await categoriesServices.getAllCategory({ query: req.query });
 
   sendResponse(res, {
     statusCode: 200,

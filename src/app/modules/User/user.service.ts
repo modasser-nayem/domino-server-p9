@@ -7,6 +7,7 @@ import { Profile, User } from "./user.model";
 import AppError from "../../error/AppError";
 import { ExtendedJwtPayload } from "../../interface";
 import mongoose from "mongoose";
+import { demoUserIds } from "../../constant/user.constant";
 
 const getMyProfile = async (payload: { user: ExtendedJwtPayload }) => {
   const profile = await Profile.findOne(
@@ -139,6 +140,13 @@ const updateUserStatus = async (payload: {
     throw new AppError(403, "You can't update own status");
   }
 
+  // demo user restricted
+  if (
+    payload.admin.id === demoUserIds.admin &&
+    payload.data.userId === "66765a1f69b25347f0d3998a"
+  ) {
+    throw new AppError(403, "You can't update super user status");
+  }
   await User.updateOne({ _id: user.id }, { status: payload.data.status });
 
   return null;
@@ -156,6 +164,13 @@ const updateUserRole = async (payload: {
 
   if (user.id === payload.admin.id) {
     throw new AppError(403, "You can't update own role");
+  }
+
+  if (
+    payload.admin.id === demoUserIds.admin &&
+    payload.data.userId === "66765a1f69b25347f0d3998a"
+  ) {
+    throw new AppError(403, "You can't update super user role");
   }
 
   await User.updateOne({ _id: user.id }, { role: payload.data.role });

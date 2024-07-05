@@ -21,8 +21,38 @@ const addCategory = async (payload: { data: TAddCategory }) => {
   return result;
 };
 
-const getAllCategory = async () => {
-  const result = await Category.find({}, { __v: 0, updatedAt: 0 });
+const getAllCategory = async (payload: { query?: Record<string, unknown> }) => {
+  const withSubcategory = payload?.query?.subcategory === "true";
+
+  let result;
+
+  if (withSubcategory) {
+    result = await Category.aggregate([
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "_id",
+          foreignField: "category",
+          as: "subcategories",
+          pipeline: [{ $project: { _id: 1, name: 1, image: 1, createdAt: 1 } }],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          image: 1,
+          subcategories: 1,
+          createdAt: 1,
+        },
+      },
+    ]);
+  } else {
+    result = await Category.find(
+      {},
+      { _id: 1, name: 1, image: 1, createdAt: 1 },
+    );
+  }
 
   return result;
 };

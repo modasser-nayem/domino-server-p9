@@ -12,7 +12,7 @@ import config from "../../config";
 import AppError from "../../error/AppError";
 import { createToken, makeHashPassword, verifyToken } from "./auth.utils";
 import { sendEmail } from "../../utils/sendEmail";
-import { UserStatus } from "../../constant/user.constant";
+import { demoUserIds, UserStatus } from "../../constant/user.constant";
 
 const registerUser = async (payload: { data: TRegisterUser }) => {
   const userData = {
@@ -104,6 +104,14 @@ const changePassword = async (payload: {
   }
 
   if (
+    payload.user.id === demoUserIds.admin ||
+    payload.user.id === demoUserIds.instructor ||
+    payload.user.id === demoUserIds.student
+  ) {
+    throw new AppError(400, "Demo user can't update password");
+  }
+
+  if (
     !(await User.isPasswordIsMatched(
       payload.data.currentPassword,
       user.password,
@@ -192,6 +200,14 @@ const deleteAccount = async (payload: { user: JwtPayload }) => {
 
   if (!user) {
     throw new AppError(404, "Account not found");
+  }
+
+  if (
+    payload.user.id === demoUserIds.admin ||
+    payload.user.id === demoUserIds.instructor ||
+    payload.user.id === demoUserIds.student
+  ) {
+    throw new AppError(400, "Demo user can't delete account!");
   }
 
   await User.findByIdAndUpdate(user.id, { isDeleted: true });
